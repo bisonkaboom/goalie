@@ -1,0 +1,39 @@
+:root {
+  --bs-body-font-family: var(--font-geist-sans), system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --goalie-brand: #0d6efd;
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #111418;
+  --bs-tertiary-bg: #1a1f26;
+  --goalie-brand: #6ea8fe;
+}
+
+body {
+  /* Respect iOS safe areas when installed as a PWA. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background-color: var(--bs-body-bg);
+}
+
+.text-brand {
+  color: var(--goalie-brand) !important;
+}
+
+.app-navbar {
+  background-color: var(--bs-body-bg);
+  backdrop-filter: saturate(180%) blur(8px);
+}
+
+/* Comfortable reading width on desktop, edge-to-edge on phones. */
+.app-container {
+  max-width: 640px;
+}
+
+/* Keep tap targets finger-friendly on mobile. */
+@media (max-width: 575.98px) {
+  .btn-lg {
+    padding-block: 0.75rem;
+  }
+}
