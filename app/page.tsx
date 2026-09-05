@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 import Card from "react-bootstrap/Card";
+// See AppNavbar: compound subcomponents must be imported directly in Server Components.
+import CardText from "react-bootstrap/CardText";
+import CardTitle from "react-bootstrap/CardTitle";
 import Container from "react-bootstrap/Container";
 import { auth } from "@/auth";
 import AppNavbar from "@/components/AppNavbar";
@@ -18,13 +21,13 @@ export default async function HomePage() {
         <p className="text-body-secondary mb-4">Here is where today&apos;s goals will live.</p>
 
         <Card body className="bg-body-tertiary border-0">
-          <Card.Title as="h2" className="h6">
+          <CardTitle as="h2" className="h6">
             Daily goals
-          </Card.Title>
-          <Card.Text className="text-body-secondary mb-0 small">
+          </CardTitle>
+          <CardText className="text-body-secondary mb-0 small">
             Nothing set up yet. Next up: create goals, give each one a point value, and
             claim the points as you finish them.
-          </Card.Text>
+          </CardText>
         </Card>
       </Container>
     </>

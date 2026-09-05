@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import Script from "next/script";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
@@ -51,10 +52,12 @@ const colorModeScript = `
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={geistSans.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: colorModeScript }} />
-      </head>
       <body className="min-vh-100">
+        <Script
+          id="bs-color-mode"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: colorModeScript }}
+        />
         {children}
         <ServiceWorkerRegistrar />
       </body>

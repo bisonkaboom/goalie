@@ -1,6 +1,10 @@
 import Container from "react-bootstrap/Container";
 import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
+// Subcomponents are imported from their own modules: `Navbar.Brand` is attached at
+// runtime via Object.assign, which a Server Component's client-reference proxy
+// cannot see, so `<Navbar.Brand>` resolves to undefined here.
+import NavbarBrand from "react-bootstrap/NavbarBrand";
 import { auth } from "@/auth";
 import BrandMark from "@/components/BrandMark";
 import { SignOutButton } from "@/components/AuthButtons";
@@ -12,10 +16,10 @@ export default async function AppNavbar() {
   return (
     <Navbar className="app-navbar border-bottom" sticky="top">
       <Container className="app-container">
-        <Navbar.Brand href="/" className="d-flex align-items-center gap-2 fw-bold text-brand">
+        <NavbarBrand href="/" className="d-flex align-items-center gap-2 fw-bold text-brand">
           <BrandMark />
           Goalie
-        </Navbar.Brand>
+        </NavbarBrand>
 
         {user ? (
           <div className="d-flex align-items-center gap-2 gap-sm-3">
