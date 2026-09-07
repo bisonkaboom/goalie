@@ -4,14 +4,14 @@ import Card from "react-bootstrap/Card";
 import CardText from "react-bootstrap/CardText";
 import CardTitle from "react-bootstrap/CardTitle";
 import Container from "react-bootstrap/Container";
-import { auth } from "@/auth";
 import AppNavbar from "@/components/AppNavbar";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 export default async function HomePage() {
-  const session = await auth();
-  if (!session?.user) redirect("/signin");
+  const user = await getCurrentUser();
+  if (!user) redirect("/signin");
 
-  const firstName = session.user.name?.split(" ")[0] ?? "there";
+  const firstName = user.name?.split(" ")[0] ?? "there";
 
   return (
     <>

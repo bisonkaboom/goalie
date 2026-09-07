@@ -5,13 +5,12 @@ import Navbar from "react-bootstrap/Navbar";
 // runtime via Object.assign, which a Server Component's client-reference proxy
 // cannot see, so `<Navbar.Brand>` resolves to undefined here.
 import NavbarBrand from "react-bootstrap/NavbarBrand";
-import { auth } from "@/auth";
 import BrandMark from "@/components/BrandMark";
 import { SignOutButton } from "@/components/AuthButtons";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 export default async function AppNavbar() {
-  const session = await auth();
-  const user = session?.user;
+  const user = await getCurrentUser();
 
   return (
     <Navbar className="app-navbar border-bottom" sticky="top">
@@ -24,9 +23,9 @@ export default async function AppNavbar() {
         {user ? (
           <div className="d-flex align-items-center gap-2 gap-sm-3">
             <div className="d-flex align-items-center gap-2 text-truncate">
-              {user.image ? (
+              {user.avatarUrl ? (
                 <Image
-                  src={user.image}
+                  src={user.avatarUrl}
                   alt=""
                   roundedCircle
                   width={32}
