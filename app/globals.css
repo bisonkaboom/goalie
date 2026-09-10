@@ -37,3 +37,28 @@ body {
     padding-block: 0.75rem;
   }
 }
+
+/* Bottom sheet for the goal editor. Bootstrap defaults .offcanvas-bottom to
+   --bs-offcanvas-height: 30vh, which clips the form; auto height sizes to
+   content and .offcanvas-bottom's own max-height:100% keeps it on screen. */
+.app-sheet {
+  --bs-offcanvas-height: auto;
+  max-height: 90dvh;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+/* The sheet spans the viewport, but its contents should line up with
+   .app-container rather than stretching across a wide desktop window. */
+.app-sheet .offcanvas-header,
+.app-sheet .offcanvas-body {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.app-sheet .offcanvas-body {
+  overflow-y: auto;
+  /* Clear the home indicator when installed as a PWA. */
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}

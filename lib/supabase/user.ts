@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export type CurrentUser = {
@@ -13,8 +14,11 @@ export type CurrentUser = {
  * `getClaims()` verifies the JWT locally when the project uses asymmetric
  * signing keys, so this costs no network round-trip per render — unlike
  * `getUser()`, which always calls the Auth API.
+ *
+ * Cached per request because the navbar, the layout and `getProfile` each want
+ * it, and the JWT signature check is not free.
  */
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<CurrentUser | null> {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
@@ -38,4 +42,4 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     name: pick("full_name", "name"),
     avatarUrl: pick("avatar_url", "picture"),
   };
-}
+});
