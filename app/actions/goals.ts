@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile, getToday } from "@/lib/db/queries";
-import { firstGrapheme } from "@/lib/emoji";
+import { DEFAULT_EMOJI, firstGrapheme, isEmojiLike } from "@/lib/emoji";
 import type { GoalDirection } from "@/lib/db/types";
 
 /**
@@ -30,6 +30,15 @@ function cleanPoints(value: unknown): number {
   const points = Math.round(Number(value));
   if (!Number.isFinite(points)) throw new Error("Points must be a number.");
   return Math.min(MAX_POINTS, Math.max(0, points));
+}
+
+/**
+ * One grapheme, and actually an emoji. Falls back to the default rather than
+ * throwing: a bad icon is not worth losing the rest of the user's input over.
+ */
+function cleanEmoji(value: unknown): string {
+  const glyph = firstGrapheme(typeof value === "string" ? value : "");
+  return isEmojiLike(glyph) ? glyph : DEFAULT_EMOJI;
 }
 
 function cleanDirection(value: unknown): GoalDirection {
@@ -107,7 +116,7 @@ export async function saveGoal(input: {
 }) {
   const supabase = await createClient();
   const name = cleanName(input.name);
-  const emoji = firstGrapheme(input.emoji);
+  const emoji = cleanEmoji(input.emoji);
   const points = cleanPoints(input.points);
   const isEnabled = Boolean(input.isEnabled);
 

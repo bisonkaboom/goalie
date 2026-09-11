@@ -17,10 +17,12 @@ import Spinner from "react-bootstrap/Spinner";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import { saveGoal } from "@/app/actions/goals";
+import EmojiPicker from "@/components/EmojiPicker";
 import { formatDayLabel } from "@/lib/dates";
 import { directionLabel } from "@/lib/db/types";
 import type { GoalDirection, GoalOnDay } from "@/lib/db/types";
-import { firstGrapheme, QUICK_EMOJI } from "@/lib/emoji";
+import { DEFAULT_EMOJI } from "@/lib/emoji";
+import { rememberEmoji } from "@/lib/emojiRecents";
 
 type Props = {
   show: boolean;
@@ -78,7 +80,7 @@ function GoalForm({
 }) {
   const isEdit = goal !== null;
 
-  const [emoji, setEmoji] = useState(goal?.emoji ?? "⭐");
+  const [emoji, setEmoji] = useState(goal?.emoji ?? DEFAULT_EMOJI);
   const [name, setName] = useState(goal?.name ?? "");
   const [direction, setDirection] = useState<GoalDirection>(goal?.direction ?? "do_more");
   const [points, setPoints] = useState(String(goal?.points ?? 10));
@@ -100,6 +102,9 @@ function GoalForm({
           points: Number(points),
           isEnabled,
         });
+        // Recorded only after the save lands, so browsing the picker and
+        // changing your mind does not fill recents with rejected emoji.
+        rememberEmoji(emoji);
         // Only closes on success, so a failed save keeps the user's input.
         onDone();
       } catch (cause) {
@@ -115,44 +120,6 @@ function GoalForm({
           {error}
         </Alert>
       ) : null}
-
-      <FormGroup className="mb-3">
-        <FormLabel htmlFor="goal-emoji">Emoji</FormLabel>
-        <div className="d-flex align-items-center gap-2 flex-wrap">
-          <FormControl
-            id="goal-emoji"
-            value={emoji}
-            // Truncating on change keeps the field to one grapheme without
-            // maxLength, which would split a multi-code-point emoji.
-            onChange={(event) => setEmoji(firstGrapheme(event.target.value, ""))}
-            onBlur={() => setEmoji((current) => firstGrapheme(current))}
-            className="text-center fs-3 p-1 flex-grow-0"
-            style={{ width: "4rem" }}
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            aria-describedby="goal-emoji-help"
-          />
-          <div className="d-flex flex-wrap gap-1">
-            {QUICK_EMOJI.map((candidate) => (
-              <Button
-                key={candidate}
-                type="button"
-                variant="light"
-                size="sm"
-                className="border"
-                aria-label={`Use ${candidate}`}
-                onClick={() => setEmoji(candidate)}
-              >
-                {candidate}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <FormText id="goal-emoji-help">
-          Tap one, or use your keyboard&apos;s emoji key.
-        </FormText>
-      </FormGroup>
 
       <FormGroup className="mb-3">
         <FormLabel htmlFor="goal-name">Name</FormLabel>
@@ -221,6 +188,13 @@ function GoalForm({
           </FormText>
         </FormGroup>
       ) : null}
+
+      {/* Last, and deliberately so: browsing emoji is the slowest part of the
+          form, and the picker is tall enough to push everything else off a
+          phone screen if it sits at the top. */}
+      <FormGroup className="mb-3">
+        <EmojiPicker value={emoji} onChange={setEmoji} />
+      </FormGroup>
 
       <FormText className="d-block mb-3">
         Point and active changes apply from {formatDayLabel(today)} onward. Earlier days
