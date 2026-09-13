@@ -6,7 +6,7 @@ import { netScore, type DayScore } from "@/lib/db/types";
 const WINDOW_DAYS = 7;
 
 /**
- * Today's score, plus the trailing week.
+ * Today's score, plus the seven completed days before it.
  *
  * Both come from a single `day_scores` call: resolving the whole range in
  * Postgres is what makes each day priced against the point values that were in
@@ -15,16 +15,20 @@ const WINDOW_DAYS = 7;
  */
 export default async function HomePage() {
   const today = await getToday();
-  const scores = await getDayScores(addDays(today, -(WINDOW_DAYS - 1)), today);
+  const yesterday = addDays(today, -1);
+  // The window is the seven days *before* today, so the range reaches back one
+  // extra day beyond the tiles to still cover today's own chart.
+  const scores = await getDayScores(addDays(today, -WINDOW_DAYS), today);
 
   // day_scores generates a row per day, but keying off the requested window
   // means the row of tiles is always seven wide regardless.
   const byDay = new Map(scores.map((score) => [score.day, score]));
-  const week: DayScore[] = daysEndingAt(today, WINDOW_DAYS).map(
-    (day) => byDay.get(day) ?? { day, positive: 0, negative: 0, target: 0 },
+  const emptyDay = (day: string): DayScore => ({ day, positive: 0, negative: 0, target: 0 });
+  const week: DayScore[] = daysEndingAt(yesterday, WINDOW_DAYS).map(
+    (day) => byDay.get(day) ?? emptyDay(day),
   );
 
-  const todayScore = week[week.length - 1];
+  const todayScore = byDay.get(today) ?? emptyDay(today);
   const scored = week.filter((score) => score.target > 0);
   const metCount = scored.filter((score) => netScore(score) >= score.target).length;
   const weekTotal = week.reduce((total, score) => total + netScore(score), 0);
@@ -38,7 +42,7 @@ export default async function HomePage() {
         <DayChart {...todayScore} label="Today" size={260} showTarget />
       </div>
 
-      <h2 className="h6 mb-2">Past 7 days</h2>
+      <h2 className="h6 mb-2">Previous 7 days</h2>
       <div className="day-week-row mb-2">
         {week.map((score) => (
           <div key={score.day} className="text-center">
