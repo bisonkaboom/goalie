@@ -111,7 +111,20 @@ export function symmetricBottomBand(value: number, target: number): Band {
   return { fullLap, arc, shadows };
 }
 
-/** Cartesian point on a circle centred at the origin, angle zero at the top. */
+/**
+ * Cartesian point on a circle centred at the origin, angle zero at the top.
+ *
+ * Rounded, and that is load-bearing rather than tidiness. ECMAScript lets every
+ * engine approximate `Math.sin`/`Math.cos` however it likes, so Node and the
+ * browser disagree in the last ulp: the shadow gradient on a lapping ring came
+ * out at 99.731485499816 server-side and 99.73148549981599 in the browser, which
+ * React reports as a hydration mismatch because the serialized attribute differs.
+ * Three decimals is the same precision d3-shape rounds its own arc paths to by
+ * default — which is exactly why the `<Arc>` `d` attributes hydrate cleanly and
+ * only these hand-built gradient coordinates did not — and at 0.001 of a
+ * 250-unit viewBox it is far below a device pixel.
+ */
 export function pointOnCircle(radius: number, angle: number) {
-  return { x: radius * Math.sin(angle), y: -radius * Math.cos(angle) };
+  const round = (value: number) => Math.round(value * 1e3) / 1e3;
+  return { x: round(radius * Math.sin(angle)), y: round(-radius * Math.cos(angle)) };
 }

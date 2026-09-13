@@ -1,3 +1,4 @@
+import CatBackground from "@/components/CatBackground";
 import DayChart from "@/components/DayChart";
 import { addDays, daysEndingAt, formatDayLabel, formatWeekdayShort } from "@/lib/dates";
 import { getDayScores, getToday } from "@/lib/db/queries";
@@ -35,34 +36,40 @@ export default async function HomePage() {
 
   return (
     <>
-      <h1 className="h4 mb-1">Today</h1>
-      <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
+      {/* Decorative, and scoped to this page: the other tabs are for editing
+          goals and tallying them, where a photo behind the form is just noise. */}
+      <CatBackground />
 
-      <div className="d-flex justify-content-center mb-4">
-        <DayChart {...todayScore} label="Today" size={260} showTarget />
-      </div>
+      <div className="cat-panel">
+        <h1 className="h4 mb-1">Today</h1>
+        <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
 
-      <h2 className="h6 mb-2">Previous 7 days</h2>
-      <div className="day-week-row mb-2">
-        {week.map((score) => (
-          <div key={score.day} className="text-center">
-            {/* The target is dropped at this size — seven of them is noise, and
-                the ring already shows how close the day came. */}
-            <DayChart {...score} showTarget={false} />
-            <div className="small text-body-secondary text-truncate mt-1">
-              {formatWeekdayShort(score.day)}
+        <div className="d-flex justify-content-center mb-4">
+          <DayChart {...todayScore} label="Today" size={260} showTarget />
+        </div>
+
+        <h2 className="h6 mb-2">Previous 7 days</h2>
+        <div className="day-week-row mb-2">
+          {week.map((score) => (
+            <div key={score.day} className="text-center">
+              {/* The target is dropped at this size — seven of them is noise, and
+                  the ring already shows how close the day came. */}
+              <DayChart {...score} showTarget={false} />
+              <div className="small text-body-secondary text-truncate mt-1">
+                {formatWeekdayShort(score.day)}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <p className="text-body-secondary small mb-0">
-        {scored.length > 0
-          ? `Target met on ${metCount} of ${scored.length} ${
-              scored.length === 1 ? "day" : "days"
-            } · ${weekTotal} pts total`
-          : `${weekTotal} pts total · set a daily target on Setup to track streaks`}
-      </p>
+        <p className="text-body-secondary small mb-0">
+          {scored.length > 0
+            ? `Target met on ${metCount} of ${scored.length} ${
+                scored.length === 1 ? "day" : "days"
+              } · ${weekTotal} pts total`
+            : `${weekTotal} pts total · set a daily target on Setup to track streaks`}
+        </p>
+      </div>
     </>
   );
 }
