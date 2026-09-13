@@ -38,6 +38,35 @@ body {
   }
 }
 
+/* Seven compact tiles sized to span exactly the width of the hero day card
+   above them. A grid of equal fractions does that at any container width,
+   where fixed-width flex items would either fall short or overflow. */
+.day-week-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.day-chart-compact {
+  /* minmax(0, 1fr) above allows shrinking; this keeps content from forcing the
+     column back open. */
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+/* Seven columns on a small phone leave roughly 40px each, so trim the gap and
+   padding to keep a three-digit score from clipping. */
+@media (max-width: 420px) {
+  .day-week-row {
+    gap: 0.25rem;
+  }
+
+  .day-chart-compact {
+    padding: 0.25rem;
+  }
+}
+
 /* Emoji tiles. Bootstrap's .btn-light hardcodes #f8f9fa and is never redefined
    for dark mode, so a light slab would sit under the glyphs at night. These
    variables all flip with data-bs-theme. */

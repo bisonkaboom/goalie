@@ -38,3 +38,12 @@ export function formatDayLabel(day: string): string {
     timeZone: "UTC",
   }).format(new Date(Date.UTC(year, month - 1, date)));
 }
+
+/** e.g. "Tue" — the label on a compact multi-day tile. */
+export function formatWeekdayShort(day: string): string {
+  const [year, month, date] = day.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, date)));
+}
