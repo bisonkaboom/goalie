@@ -2,12 +2,29 @@
   --bs-body-font-family: var(--font-geist-sans), system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
   --goalie-brand: #0d6efd;
+
+  /* Day gauge. Stepped per theme rather than flipped, and checked rather than
+     eyeballed: every pair clears OKLab dE 8 under deuteranopia, protanopia and
+     tritanopia, and every colour clears 3:1 on its surface.
+     The brand green (#42b649) is only 2.62:1 on white, and darkening it far
+     enough for text collapses its deuteranopia separation from red to 1.9 —
+     the lightness gap is the only cue that survives. So the arc green is
+     nudged just to 3:1 and the target text gets its own darker step. */
+  --goalie-net: #156fa5;
+  --goalie-positive: #3aa340;
+  --goalie-negative: #963232;
+  --goalie-positive-ink: #2f8034;
 }
 
 [data-bs-theme="dark"] {
   --bs-body-bg: #111418;
   --bs-tertiary-bg: #1a1f26;
   --goalie-brand: #6ea8fe;
+
+  --goalie-net: #4a9fd8;
+  --goalie-positive: #57d060;
+  --goalie-negative: #c25555;
+  --goalie-positive-ink: #57d060;
 }
 
 body {
@@ -47,23 +64,16 @@ body {
   gap: 0.5rem;
 }
 
-.day-chart-compact {
-  /* minmax(0, 1fr) above allows shrinking; this keeps content from forcing the
-     column back open. */
-  min-width: 0;
-  overflow: hidden;
-  padding: 0.5rem;
+.day-chart {
+  display: block;
+  height: auto;
 }
 
-/* Seven columns on a small phone leave roughly 40px each, so trim the gap and
-   padding to keep a three-digit score from clipping. */
+/* Seven columns on a small phone get tight; the gauges scale with the column
+   so only the spacing needs trimming. */
 @media (max-width: 420px) {
   .day-week-row {
     gap: 0.25rem;
-  }
-
-  .day-chart-compact {
-    padding: 0.25rem;
   }
 }
 

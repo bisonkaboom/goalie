@@ -1,5 +1,5 @@
 import DayChart from "@/components/DayChart";
-import { addDays, daysEndingAt, formatDayLabel } from "@/lib/dates";
+import { addDays, daysEndingAt, formatDayLabel, formatWeekdayShort } from "@/lib/dates";
 import { getDayScores, getToday } from "@/lib/db/queries";
 import { netScore, type DayScore } from "@/lib/db/types";
 
@@ -33,12 +33,22 @@ export default async function HomePage() {
     <>
       <h1 className="h4 mb-1">Today</h1>
       <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
-      <DayChart {...todayScore} label="Today" />
 
-      <h2 className="h6 mt-4 mb-2">Past 7 days</h2>
+      <div className="d-flex justify-content-center mb-4">
+        <DayChart {...todayScore} label="Today" size={260} showTarget />
+      </div>
+
+      <h2 className="h6 mb-2">Past 7 days</h2>
       <div className="day-week-row mb-2">
         {week.map((score) => (
-          <DayChart key={score.day} {...score} compact />
+          <div key={score.day} className="text-center">
+            {/* The target is dropped at this size — seven of them is noise, and
+                the ring already shows how close the day came. */}
+            <DayChart {...score} showTarget={false} />
+            <div className="small text-body-secondary text-truncate mt-1">
+              {formatWeekdayShort(score.day)}
+            </div>
+          </div>
         ))}
       </div>
 
