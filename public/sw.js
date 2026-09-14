@@ -1,7 +1,11 @@
 // Minimal service worker: keeps Goalie installable and serves cached static
 // assets when the network is unavailable. Pages always go to the network so
 // auth state is never served stale.
-const CACHE = "goalie-static-v1";
+// Bumped to v2 with the orange icon set. /icons/ is cached cache-first with no
+// expiry, so without a new name every already-installed client would keep
+// serving the old blue icons forever; the activate handler deletes any cache
+// whose name is not this one.
+const CACHE = "goalie-static-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 

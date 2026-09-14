@@ -1,7 +1,14 @@
 :root {
-  --bs-body-font-family: var(--font-geist-sans), system-ui, -apple-system,
-    "Segoe UI", Roboto, sans-serif;
-  --goalie-brand: #0d6efd;
+  --bs-body-font-family:
+    var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+  /* Matches the orange in the mark, so the wordmark and the logo beside it are
+     the same ink. 3.37:1 on white — fine for the tile and drop-target borders
+     this also draws, which are non-text and need 3:1, but short of the 4.5:1
+     normal text wants. The wordmark is a heavy display face at 20px, which is
+     what buys it back in practice; #c7431a is the same hue at 4.92:1 if that
+     trade is not worth making. */
+  --goalie-brand: #f15a29;
 
   /* Day gauge. Stepped per theme rather than flipped, and checked rather than
      eyeballed: every pair clears OKLab dE 8 under deuteranopia, protanopia and
@@ -28,7 +35,10 @@
 [data-bs-theme="dark"] {
   --bs-body-bg: #111418;
   --bs-tertiary-bg: #1a1f26;
-  --goalie-brand: #6ea8fe;
+  /* Held at the light-theme orange rather than lightened the way the blue was.
+     It already clears 5.51:1 on #111418, and shifting it would pull the
+     wordmark off the mark's own colour, which does not flip with the theme. */
+  --goalie-brand: #f15a29;
 
   --goalie-net: #4a9fd8;
   --goalie-positive: #57d060;
@@ -51,6 +61,20 @@ body {
 
 .text-brand {
   color: var(--goalie-brand) !important;
+}
+
+/* The wordmark. Fugaz One ships one weight, so this must not be paired with
+   .fw-bold — the browser would synthesise the bold by smearing the glyphs, and
+   a display face this heavy turns to mud when it does. The weight is pinned
+   here rather than left to inherit for the same reason: .navbar-brand and the
+   sign-in <h1> both sit inside things that set their own.
+   Falls back to the body stack, which is what renders for the swap window and
+   if the font fails to load at all. */
+.brand-wordmark {
+  font-family: var(--font-fugaz-one), var(--bs-body-font-family);
+  font-weight: 400;
+  line-height: 1;
+  font-size: 1.7rem;
 }
 
 /* 55% opaque, so the blur that was already declared here finally does something

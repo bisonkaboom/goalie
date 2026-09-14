@@ -62,6 +62,9 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Skip Next internals and static assets; everything else refreshes the session.
   matcher: [
-    "/((?!_next/static|_next/image|icons|easter-egg|manifest.webmanifest|sw.js|icon.png|apple-icon.png).*)",
+    // favicon.ico belongs here with the other icons: it is requested on routes
+    // the user is not signed in for, and without the exemption the gate answers
+    // it with a redirect to /signin instead of an image.
+    "/((?!_next/static|_next/image|icons|easter-egg|manifest.webmanifest|sw.js|favicon.ico|icon.png|apple-icon.png).*)",
   ],
 };

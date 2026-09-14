@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Fugaz_One } from "next/font/google";
 import Script from "next/script";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
@@ -9,6 +9,23 @@ import { readPreferences } from "@/lib/preferences";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+/**
+ * The wordmark face, and only the wordmark.
+ *
+ * Self-hosted through next/font rather than the <link> to fonts.googleapis.com
+ * that the foundry hands out: that link is a render-blocking round trip to a
+ * third party on every page, and it cannot be preloaded the way a same-origin
+ * file can.
+ *
+ * One weight is the entire family, which is why `.brand-wordmark` cannot also
+ * carry Bootstrap's `.fw-bold` — see globals.css.
+ */
+const fugazOne = Fugaz_One({
+  variable: "--font-fugaz-one",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -70,7 +87,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={geistSans.variable}
+      className={`${geistSans.variable} ${fugazOne.variable}`}
       // The stored choice, which the script above reads and the settings screen
       // rewrites. Kept separate from data-bs-theme because "system" is a
       // preference, not a palette.

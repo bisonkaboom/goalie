@@ -10,7 +10,9 @@ export const metadata: Metadata = {
   title: "Sign in",
 };
 
-export default async function SignInPage({ searchParams }: PageProps<"/signin">) {
+export default async function SignInPage({
+  searchParams,
+}: PageProps<"/signin">) {
   const user = await getCurrentUser();
   if (user) redirect("/");
 
@@ -22,13 +24,14 @@ export default async function SignInPage({ searchParams }: PageProps<"/signin">)
       as="main"
       className="d-flex flex-column justify-content-center min-vh-100 py-5"
       // Narrower than any shared width: this page is one card, centred.
-      style={{ maxWidth: 420 }}
-    >
+      style={{ maxWidth: 420 }}>
       <div className="text-center mb-4">
-        <span className="text-brand d-inline-flex">
+        <span className="d-inline-flex">
           <BrandMark size={56} />
         </span>
-        <h1 className="h3 fw-bold mt-3 mb-1">Goalie</h1>
+        <h1 className="brand-wordmark brand-wordmark-lg text-brand mt-3 mb-1">
+          Goalie
+        </h1>
         <p className="text-body-secondary mb-0">
           Set a few daily goals, claim the points, keep the streak.
         </p>
