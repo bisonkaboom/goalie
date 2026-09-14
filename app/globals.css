@@ -69,9 +69,28 @@ body {
   backdrop-filter: saturate(180%) blur(8px);
 }
 
-/* Comfortable reading width on desktop, edge-to-edge on phones. */
-.app-container {
+/* The app's outer width, shared by the navbar and <main> so that the brand, the
+   tabs and the page content all line up on one pair of edges.
+   Wider than a reading column at lg because the tally screen puts Do More and
+   Do Less side by side there, which needs about 2x420px before the goal names
+   start truncating. Driven by the viewport rather than the route, so the navbar
+   keeps one width across all three tabs instead of jumping on navigation. */
+.app-shell {
   max-width: 640px;
+}
+
+@media (min-width: 992px) {
+  .app-shell {
+    max-width: 1040px;
+  }
+}
+
+/* Comfortable reading width, edge-to-edge on phones. Pages that are a single
+   column of prose or form opt into this inside the wider shell, so widening the
+   shell for the tally screen does not stretch them too. */
+.app-reading {
+  max-width: 640px;
+  margin-inline: auto;
 }
 
 /* Keep tap targets finger-friendly on mobile. */
@@ -138,6 +157,10 @@ body {
    shifts once the photo arrives. */
 .cat-panel {
   position: relative;
+  /* Home is a single column, so it keeps the reading width inside the wider
+     shell — which also leaves more cat visible beside it on a desktop. */
+  max-width: 640px;
+  margin-inline: auto;
   margin-top: 3rem;
   padding: 1.25rem;
   border: 1px solid var(--bs-border-color-translucent);
@@ -183,6 +206,109 @@ body {
   }
 }
 
+/* Do More beside Do Less once the shell widens at lg, stacked below it.
+   minmax(0, 1fr) rather than 1fr for the same reason as .day-week-row: a plain
+   1fr track has an automatic minimum, which stops text-truncate working on the
+   goal names inside. align-items: start keeps the shorter column from being
+   stretched to match the taller one. */
+.tally-columns {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 992px) {
+  .tally-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+/* Time-of-day buckets on the tally screen. */
+.bucket-panel {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Dashed while a drag is in flight, but only on the buckets that drag can
+   legally land in — a Do Less goal cannot cross into a Do More bucket, so those
+   deliberately stay flat rather than inviting a drop that would be refused. */
+.bucket-panel-candidate {
+  border-style: dashed;
+  border-color: var(--goalie-brand);
+}
+
+.bucket-panel-over {
+  border-style: solid;
+  background-color: var(--bs-tertiary-bg);
+  box-shadow: inset 0 0 0 1px var(--goalie-brand);
+}
+
+.bucket-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 0;
+  background-color: transparent;
+  color: var(--bs-body-color);
+}
+
+.bucket-header:hover {
+  background-color: var(--bs-tertiary-bg);
+}
+
+/* Rotates rather than swapping glyphs, so the control does not reflow by a
+   pixel when a bucket opens. */
+.bucket-caret {
+  transition: transform 150ms ease;
+}
+
+.bucket-caret-open {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bucket-caret {
+    transition: none;
+  }
+}
+
+.bucket-empty {
+  padding: 0.75rem;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+/* The drag handle. `touch-action: none` is the load-bearing line: without it the
+   browser claims the gesture for scrolling and the drag never starts on a phone.
+   Confining it to the handle is what keeps the rest of the row scrollable. */
+.tally-grip {
+  flex: none;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  background-color: transparent;
+  color: var(--bs-secondary-color);
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+}
+
+.tally-grip:active {
+  cursor: grabbing;
+}
+
+/* The floating copy under the cursor. It leaves the list's stacking context, so
+   it needs its own surface to sit on. */
+.tally-row-overlay {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--goalie-brand);
+  border-radius: 0.5rem;
+  background-color: var(--bs-body-bg);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+  cursor: grabbing;
+}
+
 /* Emoji tiles. Bootstrap's .btn-light hardcodes #f8f9fa and is never redefined
    for dark mode, so a light slab would sit under the glyphs at night. These
    variables all flip with data-bs-theme. */
@@ -216,8 +342,8 @@ body {
   border-top-right-radius: 1rem;
 }
 
-/* The sheet spans the viewport, but its contents should line up with
-   .app-container rather than stretching across a wide desktop window. */
+/* The sheet spans the viewport, but its contents should stay at the reading
+   width rather than stretching across a wide desktop window. */
 .app-sheet .offcanvas-header,
 .app-sheet .offcanvas-body {
   width: 100%;

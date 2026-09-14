@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile, getToday } from "@/lib/db/queries";
 import { DEFAULT_EMOJI, firstGrapheme, isEmojiLike } from "@/lib/emoji";
-import type { GoalDirection } from "@/lib/db/types";
+import { isGoalBucket, type GoalDirection } from "@/lib/db/types";
 
 /**
  * Every export in this file is a public POST endpoint, so nothing trusts the
@@ -165,6 +165,26 @@ export async function saveGoal(input: {
     is_enabled: isEnabled,
   });
   if (settingError) throw settingError;
+
+  revalidateAll();
+}
+
+/**
+ * Moves a goal between the tally screen's time-of-day buckets.
+ *
+ * Not effective-dated, and not validated against `direction`: a bucket changes
+ * where a goal is drawn, never what any day scored, so there is nothing to fork
+ * history over and no combination that is invalid. Authorization is the
+ * `goals_own` RLS policy — an id belonging to another user matches no row and
+ * the update is a no-op, which is the same guarantee `saveGoal` relies on.
+ */
+export async function setGoalBucket(goalId: string, bucket: string) {
+  if (typeof goalId !== "string" || !goalId) throw new Error("Missing goal.");
+  if (!isGoalBucket(bucket)) throw new Error("Unknown bucket.");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("goals").update({ bucket }).eq("id", goalId);
+  if (error) throw error;
 
   revalidateAll();
 }

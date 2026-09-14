@@ -16,7 +16,7 @@ export default async function TabsLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <AppNavbar />
-      <Container as="main" className="app-container py-4">
+      <Container as="main" className="app-shell py-4">
         {children}
       </Container>
       <TimeZoneSync current={profile.timeZone} />

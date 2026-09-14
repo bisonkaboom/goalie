@@ -20,7 +20,8 @@ export default async function SignInPage({ searchParams }: PageProps<"/signin">)
   return (
     <Container
       as="main"
-      className="app-container d-flex flex-column justify-content-center min-vh-100 py-5"
+      className="d-flex flex-column justify-content-center min-vh-100 py-5"
+      // Narrower than any shared width: this page is one card, centred.
       style={{ maxWidth: 420 }}
     >
       <div className="text-center mb-4">

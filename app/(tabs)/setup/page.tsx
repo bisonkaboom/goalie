@@ -18,10 +18,12 @@ export default async function SetupPage() {
   ]);
 
   return (
-    <>
+    // A single column of cards and forms, so it keeps the reading width rather
+    // than stretching to the wider shell the tally screen needs.
+    <div className="app-reading">
       <h1 className="h4 mb-3">Setup</h1>
       <DailyTargetCard target={target} today={today} />
       <GoalSetupList goals={goals} today={today} />
-    </>
+    </div>
   );
 }

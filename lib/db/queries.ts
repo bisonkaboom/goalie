@@ -88,7 +88,7 @@ export async function getGoalsOnDay(day: string): Promise<GoalOnDay[]> {
 
   const { data: goalRows, error: goalsError } = await supabase
     .from("goals")
-    .select("id, name, emoji, direction, sort_order");
+    .select("id, name, emoji, direction, bucket, sort_order");
   if (goalsError) throw goalsError;
 
   const goals: Goal[] = (goalRows ?? []).map((row) => ({
@@ -96,6 +96,7 @@ export async function getGoalsOnDay(day: string): Promise<GoalOnDay[]> {
     name: row.name,
     emoji: row.emoji,
     direction: row.direction,
+    bucket: row.bucket,
     sortOrder: row.sort_order,
   }));
 

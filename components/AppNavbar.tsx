@@ -19,7 +19,7 @@ export default async function AppNavbar() {
 
   return (
     <Navbar className="app-navbar border-bottom p-0" sticky="top">
-      <Container className="app-container flex-column align-items-stretch px-3">
+      <Container className="app-shell flex-column align-items-stretch px-3">
         <div className="d-flex align-items-center justify-content-between py-2">
           <NavbarBrand href="/" className="d-flex align-items-center gap-2 fw-bold text-brand">
             <BrandMark />
