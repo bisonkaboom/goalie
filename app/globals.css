@@ -213,19 +213,18 @@ body {
   backdrop-filter: blur(4px) saturate(140%);
 }
 
-/* The gauges get an opaque surface back, because they are what a translucent
-   panel actually breaks. The arc green is only 3.23:1 on white — it was tuned
-   to land just over 3:1, since darkening it further collapses its deuteranopia
-   separation from red — so any photo showing through puts it under WCAG 1.4.11.
-   No fixed mid-tone survives an arbitrary photo either: a colour dark enough
-   for a white photo is too dark for a black one.
-   The disc is exactly inscribed — the outer ring's edge sits at radius 125.16
-   of the 250-unit viewBox — so it reads as a coin rather than a patch, and it
-   also gives the multiply shadow ramp the light backdrop it assumes. */
-.animal-panel .day-chart {
-  background-color: var(--bs-body-bg);
-  border-radius: 50%;
-}
+/* The gauges deliberately have no surface of their own: the rings sit straight
+   on the frosted panel, so the photo carries right through the middle of them.
+   There used to be an opaque disc here, inscribed to the outer ring, and it was
+   doing real work — the arc green is only 3.23:1 on white, tuned to land just
+   over 3:1 because darkening it further collapses its deuteranopia separation
+   from red, so a photo showing through can put it under WCAG 1.4.11's 3:1 for
+   non-text contrast. Dropping the disc trades that away for the photo.
+   Nothing else is holding the arcs up, so if they start to disappear over busy
+   photos the lever is --goalie-bg-scrim: 0.66 keeps the panel itself at AA even
+   down at 0.22 opacity, and it darkens what the rings sit on at the same time.
+   A fixed mid-tone disc is not the way back — a colour dark enough to carry a
+   white photo is too dark for a black one. */
 
 /* Seven compact tiles sized to span exactly the width of the hero day card
    above them. A grid of equal fractions does that at any container width,

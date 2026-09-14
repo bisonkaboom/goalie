@@ -1,6 +1,11 @@
 import AnimalBackground from "@/components/AnimalBackground";
 import DayChart from "@/components/DayChart";
-import { addDays, daysEndingAt, formatDayLabel, formatWeekdayShort } from "@/lib/dates";
+import {
+  addDays,
+  daysEndingAt,
+  formatDayLabel,
+  formatWeekdayShort,
+} from "@/lib/dates";
 import { getDayScores, getToday } from "@/lib/db/queries";
 import { netScore, type DayScore } from "@/lib/db/types";
 import { readPreferences } from "@/lib/preferences";
@@ -27,14 +32,21 @@ export default async function HomePage() {
   // day_scores generates a row per day, but keying off the requested window
   // means the row of tiles is always seven wide regardless.
   const byDay = new Map(scores.map((score) => [score.day, score]));
-  const emptyDay = (day: string): DayScore => ({ day, positive: 0, negative: 0, target: 0 });
+  const emptyDay = (day: string): DayScore => ({
+    day,
+    positive: 0,
+    negative: 0,
+    target: 0,
+  });
   const week: DayScore[] = daysEndingAt(yesterday, WINDOW_DAYS).map(
     (day) => byDay.get(day) ?? emptyDay(day),
   );
 
   const todayScore = byDay.get(today) ?? emptyDay(today);
   const scored = week.filter((score) => score.target > 0);
-  const metCount = scored.filter((score) => netScore(score) >= score.target).length;
+  const metCount = scored.filter(
+    (score) => netScore(score) >= score.target,
+  ).length;
   const weekTotal = week.reduce((total, score) => total + netScore(score), 0);
 
   return (
@@ -68,7 +80,7 @@ export default async function HomePage() {
           ))}
         </div>
 
-        <p className="text-body-secondary small mb-0">
+        <p className="text-center text-secondary small mb-0 fst-italic">
           {scored.length > 0
             ? `Target met on ${metCount} of ${scored.length} ${
                 scored.length === 1 ? "day" : "days"
