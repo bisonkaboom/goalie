@@ -85,6 +85,25 @@ body {
   }
 }
 
+/* The account chip. Bootstrap's .btn-link brings a link colour, an underline on
+   hover and button padding, none of which suit a name sitting in the header —
+   and its colour is the one that fails contrast over the translucent navbar. */
+.user-menu-toggle {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-active-color: var(--bs-body-color);
+  padding: 0;
+  text-decoration: none;
+  /* The name is the only flexible part of the header's top row, so it is what
+     gives way when a long first name meets a narrow phone. */
+  max-width: 12rem;
+}
+
+.user-menu-toggle:hover,
+.user-menu-toggle:focus-visible {
+  text-decoration: none;
+}
+
 /* Comfortable reading width, edge-to-edge on phones. Pages that are a single
    column of prose or form opt into this inside the wider shell, so widening the
    shell for the tally screen does not stretch them too. */
@@ -157,10 +176,8 @@ body {
    shifts once the photo arrives. */
 .cat-panel {
   position: relative;
-  /* Home is a single column, so it keeps the reading width inside the wider
-     shell — which also leaves more cat visible beside it on a desktop. */
-  max-width: 640px;
-  margin-inline: auto;
+  /* Width comes from .app-reading, which Home carries whether or not the cat is
+     switched on — so turning the cat off leaves the column where it was. */
   margin-top: 3rem;
   padding: 1.25rem;
   border: 1px solid var(--bs-border-color-translucent);

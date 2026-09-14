@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/client";
 import GoogleIcon from "@/components/GoogleIcon";
 
@@ -57,15 +56,5 @@ export function SignInButton() {
         </p>
       ) : null}
     </>
-  );
-}
-
-export function SignOutButton() {
-  return (
-    <form action={signOut}>
-      <Button type="submit" variant="outline-secondary" size="sm">
-        Sign out
-      </Button>
-    </form>
   );
 }

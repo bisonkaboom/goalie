@@ -1,14 +1,29 @@
 import Container from "react-bootstrap/Container";
-import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 // Subcomponents are imported from their own modules: `Navbar.Brand` is attached at
 // runtime via Object.assign, which a Server Component's client-reference proxy
 // cannot see, so `<Navbar.Brand>` resolves to undefined here.
 import NavbarBrand from "react-bootstrap/NavbarBrand";
 import BrandMark from "@/components/BrandMark";
-import { SignOutButton } from "@/components/AuthButtons";
 import TabNav from "@/components/TabNav";
+import UserMenu from "@/components/UserMenu";
 import { getCurrentUser } from "@/lib/supabase/user";
+
+/**
+ * The chip says "Bison", not "Bison McCotter-Hulett": the navbar is the one
+ * place the name competes for width with the brand and the tabs, and a full
+ * name from Google can be long enough to truncate on a phone.
+ *
+ * Falls back through the email's local part to a generic label, because `name`
+ * is read from optional JWT metadata and other providers may not populate it.
+ */
+function firstName(name: string | null, email: string | null): string {
+  const first = name?.trim().split(/\s+/)[0];
+  if (first) return first;
+
+  const local = email?.split("@")[0];
+  return local || "Account";
+}
 
 /**
  * Two stacked rows — identity above, section tabs below — so the tabs stay
@@ -27,24 +42,7 @@ export default async function AppNavbar() {
           </NavbarBrand>
 
           {user ? (
-            <div className="d-flex align-items-center gap-2 gap-sm-3">
-              <div className="d-flex align-items-center gap-2 text-truncate">
-                {user.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt=""
-                    roundedCircle
-                    width={32}
-                    height={32}
-                    referrerPolicy="no-referrer"
-                  />
-                ) : null}
-                <span className="fw-medium text-truncate d-none d-sm-inline">
-                  {user.name ?? user.email}
-                </span>
-              </div>
-              <SignOutButton />
-            </div>
+            <UserMenu name={firstName(user.name, user.email)} avatarUrl={user.avatarUrl} />
           ) : null}
         </div>
 
