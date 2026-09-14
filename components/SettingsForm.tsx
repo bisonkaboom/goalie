@@ -4,10 +4,11 @@ import { useOptimistic, useTransition } from "react";
 import Card from "react-bootstrap/Card";
 // Subcomponents are imported from their own modules: see AppNavbar.
 import CardBody from "react-bootstrap/CardBody";
-import FormCheck from "react-bootstrap/FormCheck";
+import FormSelect from "react-bootstrap/FormSelect";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
-import { setCatBackground, setThemePreference } from "@/app/actions/preferences";
+import { setBackground, setThemePreference } from "@/app/actions/preferences";
+import { BACKGROUND_KINDS, backgroundLabel, isBackgroundKind } from "@/lib/backgrounds";
 import type { Preferences, ThemePreference } from "@/lib/preferences";
 
 const THEMES: readonly { value: ThemePreference; label: string }[] = [
@@ -52,10 +53,14 @@ export default function SettingsForm({ preferences }: { preferences: Preferences
     });
   }
 
-  function toggleCat(catBackground: boolean) {
+  function chooseBackground(value: string) {
+    // The <select> hands back a plain string; narrow before it reaches state, so
+    // the optimistic value and the persisted one cannot disagree about the type.
+    if (!isBackgroundKind(value)) return;
+
     startTransition(async () => {
-      apply({ catBackground });
-      await setCatBackground(catBackground);
+      apply({ background: value });
+      await setBackground(value);
     });
   }
 
@@ -91,19 +96,24 @@ export default function SettingsForm({ preferences }: { preferences: Preferences
 
       <Card>
         <CardBody>
-          <h2 className="h6 mb-1">Cat background</h2>
+          <h2 className="h6 mb-1">Home background</h2>
           <p className="small text-body-secondary mb-3">
-            A different cat behind the Home page on every visit. Turning this off also removes
-            the panel it sits behind, and stops Home fetching the photo at all.
+            A different animal behind the Home page on every visit. Smorgasbord draws from all
+            four sources, picking a new species each time. None removes the panel too, and stops
+            Home fetching a photo at all.
           </p>
 
-          <FormCheck
-            type="switch"
-            id="cat-background"
-            label={optimistic.catBackground ? "On" : "Off"}
-            checked={optimistic.catBackground}
-            onChange={(event) => toggleCat(event.currentTarget.checked)}
-          />
+          <FormSelect
+            value={optimistic.background}
+            onChange={(event) => chooseBackground(event.currentTarget.value)}
+            aria-label="Home background"
+          >
+            {BACKGROUND_KINDS.map((kind) => (
+              <option key={kind} value={kind}>
+                {backgroundLabel(kind)}
+              </option>
+            ))}
+          </FormSelect>
         </CardBody>
       </Card>
     </>

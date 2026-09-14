@@ -1,4 +1,4 @@
-import CatBackground from "@/components/CatBackground";
+import AnimalBackground from "@/components/AnimalBackground";
 import DayChart from "@/components/DayChart";
 import { addDays, daysEndingAt, formatDayLabel, formatWeekdayShort } from "@/lib/dates";
 import { getDayScores, getToday } from "@/lib/db/queries";
@@ -16,7 +16,8 @@ const WINDOW_DAYS = 7;
  * before it.
  */
 export default async function HomePage() {
-  const { catBackground } = await readPreferences();
+  const { background } = await readPreferences();
+  const showPhoto = background !== "none";
   const today = await getToday();
   const yesterday = addDays(today, -1);
   // The window is the seven days *before* today, so the range reaches back one
@@ -40,12 +41,12 @@ export default async function HomePage() {
     <>
       {/* Decorative, and scoped to this page: the other tabs are for editing
           goals and tallying them, where a photo behind the form is just noise.
-          Switched off in Settings, this renders nothing and never fetches. */}
-      {catBackground ? <CatBackground /> : null}
+          Set to None in Settings, this renders nothing and never fetches. */}
+      {showPhoto ? <AnimalBackground kind={background} /> : null}
 
       {/* The frosted slab only earns its border and shadow when there is a photo
-          behind it, so without the cat Home is plain content again. */}
-      <div className={`app-reading${catBackground ? " cat-panel" : ""}`}>
+          behind it, so with None the Home page is plain content again. */}
+      <div className={`app-reading${showPhoto ? " animal-panel" : ""}`}>
         <h1 className="h4 mb-1">Today</h1>
         <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
 

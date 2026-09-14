@@ -15,12 +15,12 @@
   --goalie-negative: #963232;
   --goalie-positive-ink: #2f8034;
 
-  /* Random cat backdrop. The scrim is a flat wash rather than a gradient
+  /* Random animal backdrop. The scrim is a flat wash rather than a gradient
      because the photo layer is fixed and the panel over it scrolls, so there is
      no stable place to aim a gradient at. */
-  --goalie-cat-scrim: rgba(255, 255, 255, 0.32);
-  --goalie-cat-panel: rgba(255, 255, 255, 0.72);
-  --goalie-cat-panel-shadow: rgba(0, 0, 0, 0.12);
+  --goalie-bg-scrim: rgba(255, 255, 255, 0.32);
+  --goalie-bg-panel: rgba(255, 255, 255, 0.72);
+  --goalie-bg-panel-shadow: rgba(0, 0, 0, 0.12);
 
   --goalie-nav-bg: rgba(255, 255, 255, 0.55);
 }
@@ -35,9 +35,9 @@
   --goalie-negative: #c25555;
   --goalie-positive-ink: #57d060;
 
-  --goalie-cat-scrim: rgba(17, 20, 24, 0.46);
-  --goalie-cat-panel: rgba(17, 20, 24, 0.4);
-  --goalie-cat-panel-shadow: rgba(0, 0, 0, 0.5);
+  --goalie-bg-scrim: rgba(17, 20, 24, 0.46);
+  --goalie-bg-panel: rgba(17, 20, 24, 0.4);
+  --goalie-bg-panel-shadow: rgba(0, 0, 0, 0.5);
 
   --goalie-nav-bg: rgba(17, 20, 24, 0.55);
 }
@@ -56,14 +56,14 @@ body {
 /* 55% opaque, so the blur that was already declared here finally does something
    — against the old solid --bs-body-bg it had nothing to see through.
 
-   The cost lands on the home page, where the backdrop is the cat rather than the
+   The cost lands on the home page, where the backdrop is a photo rather than the
    body colour. --bs-link-color (#0d6efd), which the wordmark and the idle tab
    links both use, is exactly 4.50:1 on white — zero headroom, the same bind the
-   arc green is in — so over a dark cat it drops to 2.10:1. The active tab and the
+   arc green is in — so over a dark photo it drops to 2.10:1. The active tab and the
    user name stay fine (9.8:1 and 7.2:1) because they use emphasis and body ink.
    Two ways to buy it back if it reads badly: darken --bs-link-color scoped to
-   this rule, or raise --goalie-cat-scrim. The other tabs are unaffected — with no
-   cat behind it, 55% white over white is still white. */
+   this rule, or raise --goalie-bg-scrim. The other tabs are unaffected — with no
+   photo behind it, 55% white over white is still white. */
 .app-navbar {
   background-color: var(--goalie-nav-bg);
   backdrop-filter: saturate(180%) blur(8px);
@@ -119,47 +119,48 @@ body {
   }
 }
 
-/* The cat photo, held still behind a scrolling page. Negative z-index works
+/* The animal photo, held still behind a scrolling page. Negative z-index works
    here because `body`'s background-color propagates to the canvas — it is
    painted beneath this layer rather than as a box on top of it. The sticky
    navbar carries its own opaque background and Bootstrap's z-index 1020, so it
-   stays above the cat and keeps its contrast. */
-.cat-bg {
+   stays above the photo and keeps its contrast. */
+.animal-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: var(--cat-bg-image);
+  background-image: var(--animal-bg-image);
   background-position: center;
   background-size: cover;
   opacity: 0;
   transition: opacity 700ms ease-in;
 }
 
-.cat-bg-ready {
+.animal-bg-ready {
   opacity: 1;
 }
 
-/* A flat wash over the photo. Cats arrive at any exposure, so this pulls the
-   whole range toward the theme background: it stops a blown-out white cat from
-   glaring and a black cat from turning the page into a void. */
-.cat-bg::after {
+/* A flat wash over the photo. Animals arrive at any exposure, and a duck on
+   snow is a different problem from a black cat, so this pulls the whole range
+   toward the theme background: it stops a blown-out photo from glaring and a
+   very dark one from turning the page into a void. */
+.animal-bg::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-color: var(--goalie-cat-scrim);
+  background-color: var(--goalie-bg-scrim);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cat-bg {
+  .animal-bg {
     transition: none;
   }
 }
 
 /* The slab the page content rides on, floated far enough down to leave a band
-   of cat visible under the navbar.
+   of the photo visible under the navbar.
 
    72% is where the text stops being the limit. Measured against the photo that
-   hurts each theme most — a pure black cat in light mode, a pure white one in
+   hurts each theme most — a pure black photo in light mode, a pure white one in
    dark — the composited surface still clears AA on both:
 
      light -> body 9.85:1, secondary 5.23:1
@@ -168,22 +169,23 @@ body {
    "secondary" is Bootstrap's --bs-secondary-color, which is itself translucent
    (0.75) and so composites against this surface rather than sitting on it; it
    is the binding case, not --bs-body-color. Dropping the panel below about 0.60
-   in light mode is what puts it under 4.5:1. Raising --goalie-cat-scrim buys the
+   in light mode is what puts it under 4.5:1. Raising --goalie-bg-scrim buys the
    same headroom if more of the photo is wanted here: scrim 0.66 holds AA even
    with the panel down at 0.22.
 
-   Styled unconditionally, including when no cat loads, so the layout never
-   shifts once the photo arrives. */
-.cat-panel {
+   Styled unconditionally, including when a photo fails to load, so the layout
+   never shifts once one arrives. Not applied at all when the background is set
+   to None, which is known on the server and so cannot shift anything. */
+.animal-panel {
   position: relative;
-  /* Width comes from .app-reading, which Home carries whether or not the cat is
-     switched on — so turning the cat off leaves the column where it was. */
+  /* Width comes from .app-reading, which Home carries whether or not a photo is
+     switched on — so choosing None leaves the column where it was. */
   margin-top: 3rem;
   padding: 1.25rem;
   border: 1px solid var(--bs-border-color-translucent);
   border-radius: 1rem;
-  background-color: var(--goalie-cat-panel);
-  box-shadow: 0 1rem 2rem var(--goalie-cat-panel-shadow);
+  background-color: var(--goalie-bg-panel);
+  box-shadow: 0 1rem 2rem var(--goalie-bg-panel-shadow);
   backdrop-filter: blur(4px) saturate(140%);
 }
 
@@ -192,11 +194,11 @@ body {
    to land just over 3:1, since darkening it further collapses its deuteranopia
    separation from red — so any photo showing through puts it under WCAG 1.4.11.
    No fixed mid-tone survives an arbitrary photo either: a colour dark enough
-   for a white cat is too dark for a black one.
+   for a white photo is too dark for a black one.
    The disc is exactly inscribed — the outer ring's edge sits at radius 125.16
    of the 250-unit viewBox — so it reads as a coin rather than a patch, and it
    also gives the multiply shadow ramp the light backdrop it assumes. */
-.cat-panel .day-chart {
+.animal-panel .day-chart {
   background-color: var(--bs-body-bg);
   border-radius: 50%;
 }

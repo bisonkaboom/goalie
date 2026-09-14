@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { isBackgroundKind } from "@/lib/backgrounds";
 import {
-  CAT_COOKIE,
+  BACKGROUND_COOKIE,
   PREFERENCE_MAX_AGE,
   THEME_COOKIE,
   isThemePreference,
@@ -42,7 +43,8 @@ export async function setThemePreference(value: string) {
   revalidatePath("/", "layout");
 }
 
-export async function setCatBackground(enabled: boolean) {
-  await writePreference(CAT_COOKIE, enabled ? "on" : "off");
+export async function setBackground(value: string) {
+  if (!isBackgroundKind(value)) throw new Error("Unknown background.");
+  await writePreference(BACKGROUND_COOKIE, value);
   revalidatePath("/", "layout");
 }
