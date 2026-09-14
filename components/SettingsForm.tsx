@@ -1,12 +1,13 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import Card from "react-bootstrap/Card";
 // Subcomponents are imported from their own modules: see AppNavbar.
 import CardBody from "react-bootstrap/CardBody";
 import FormSelect from "react-bootstrap/FormSelect";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
+import SillyDuck from "@/components/SillyDuck";
 import { setBackground, setThemePreference } from "@/app/actions/preferences";
 import { BACKGROUND_KINDS, backgroundLabel, isBackgroundKind } from "@/lib/backgrounds";
 import type { Preferences, ThemePreference } from "@/lib/preferences";
@@ -45,6 +46,12 @@ export default function SettingsForm({ preferences }: { preferences: Preferences
     (state: Preferences, change: Partial<Preferences>) => ({ ...state, ...change }),
   );
 
+  const [showDuck, setShowDuck] = useState(false);
+  // Not persisted, so the gag is live again on the next visit to this screen.
+  // It only ever costs one extra click, and an easter egg that fires once per
+  // account and never again is one almost nobody would see.
+  const [hasInsisted, setHasInsisted] = useState(false);
+
   function chooseTheme(theme: ThemePreference) {
     startTransition(async () => {
       apply({ theme });
@@ -57,6 +64,16 @@ export default function SettingsForm({ preferences }: { preferences: Preferences
     // The <select> hands back a plain string; narrow before it reaches state, so
     // the optimistic value and the persisted one cannot disagree about the type.
     if (!isBackgroundKind(value)) return;
+
+    // The duck protests the first time, and nothing is saved — re-rendering with
+    // the unchanged optimistic value is what snaps the <select> back on its own.
+    // Insisting gets you through, so the joke cannot permanently hide a real
+    // setting.
+    if (value === "none" && !hasInsisted) {
+      setHasInsisted(true);
+      setShowDuck(true);
+      return;
+    }
 
     startTransition(async () => {
       apply({ background: value });
@@ -116,6 +133,8 @@ export default function SettingsForm({ preferences }: { preferences: Preferences
           </FormSelect>
         </CardBody>
       </Card>
+
+      {showDuck ? <SillyDuck onDismiss={() => setShowDuck(false)} /> : null}
     </>
   );
 }

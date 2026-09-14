@@ -351,6 +351,61 @@ body {
   box-shadow: inset 0 0 0 1px var(--goalie-brand);
 }
 
+/* Easter egg: choosing "None" for the Home background gets you told off.
+   z-index clears the sticky navbar's 1020 and Bootstrap's 1055 modal layer,
+   because "the screen goes blank" has to mean all of it — a takeover with the
+   header still showing through is just a banner. Fixed rather than absolute so
+   it covers the viewport regardless of where the page is scrolled to. */
+.silly-duck {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  /* Not a theme variable: blank means black in either theme. */
+  background-color: #000;
+  text-align: center;
+  /* The whole surface dismisses, so it should say so under the pointer. */
+  cursor: pointer;
+}
+
+.silly-duck-text {
+  max-width: 18ch;
+  margin: 0;
+  color: #fff;
+  /* Scales with the viewport so the insult fits on one phone screen without
+     wrapping into something unreadable. */
+  font-size: clamp(1.75rem, 8vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.silly-duck-art {
+  width: min(55vw, 260px);
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* A real focusable control, so the overlay is dismissible by keyboard and
+   announced as something actionable rather than being a dead black rectangle. */
+.silly-duck-dismiss {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 2rem;
+  background-color: transparent;
+  color: #fff;
+}
+
+.silly-duck-dismiss:hover,
+.silly-duck-dismiss:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
 /* Bottom sheet for the goal editor. Bootstrap defaults .offcanvas-bottom to
    --bs-offcanvas-height: 30vh, which clips the form; auto height sizes to
    content and .offcanvas-bottom's own max-height:100% keeps it on screen. */

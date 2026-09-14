@@ -62,6 +62,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Skip Next internals and static assets; everything else refreshes the session.
   matcher: [
-    "/((?!_next/static|_next/image|icons|manifest.webmanifest|sw.js|icon.png|apple-icon.png).*)",
+    "/((?!_next/static|_next/image|icons|easter-egg|manifest.webmanifest|sw.js|icon.png|apple-icon.png).*)",
   ],
 };
