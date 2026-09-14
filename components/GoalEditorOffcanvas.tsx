@@ -55,15 +55,19 @@ export default function GoalEditorOffcanvas({
       onExited={onExited}
       placement="bottom"
       className="app-sheet"
-      aria-labelledby="goal-editor-title"
-    >
-      <OffcanvasHeader closeButton>
+      aria-labelledby="goal-editor-title">
+      <OffcanvasHeader className="pb-0" closeButton>
         <OffcanvasTitle id="goal-editor-title" as="h2" className="h5">
-          {goal ? "Edit goal" : "New goal"}
+          {goal ? "Edit Goal" : "New Goal"}
         </OffcanvasTitle>
       </OffcanvasHeader>
       <OffcanvasBody>
-        <GoalForm key={goal?.id ?? "new"} goal={goal} today={today} onDone={onHide} />
+        <GoalForm
+          key={goal?.id ?? "new"}
+          goal={goal}
+          today={today}
+          onDone={onHide}
+        />
       </OffcanvasBody>
     </Offcanvas>
   );
@@ -82,7 +86,9 @@ function GoalForm({
 
   const [emoji, setEmoji] = useState(goal?.emoji ?? DEFAULT_EMOJI);
   const [name, setName] = useState(goal?.name ?? "");
-  const [direction, setDirection] = useState<GoalDirection>(goal?.direction ?? "do_more");
+  const [direction, setDirection] = useState<GoalDirection>(
+    goal?.direction ?? "do_more",
+  );
   const [points, setPoints] = useState(String(goal?.points ?? 10));
   const [isEnabled, setIsEnabled] = useState(goal?.isEnabled ?? true);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +114,9 @@ function GoalForm({
         // Only closes on success, so a failed save keeps the user's input.
         onDone();
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Could not save the goal.");
+        setError(
+          cause instanceof Error ? cause.message : "Could not save the goal.",
+        );
       }
     });
   }
@@ -149,12 +157,17 @@ function GoalForm({
             name="direction"
             value={direction}
             onChange={(next: GoalDirection) => setDirection(next)}
-            className="d-flex"
-          >
-            <ToggleButton id="direction-do-more" value="do_more" variant="outline-success">
+            className="d-flex">
+            <ToggleButton
+              id="direction-do-more"
+              value="do_more"
+              variant="outline-success">
               Do More
             </ToggleButton>
-            <ToggleButton id="direction-do-less" value="do_less" variant="outline-danger">
+            <ToggleButton
+              id="direction-do-less"
+              value="do_less"
+              variant="outline-danger">
               Do Less
             </ToggleButton>
           </ToggleButtonGroup>
@@ -196,20 +209,30 @@ function GoalForm({
         <EmojiPicker value={emoji} onChange={setEmoji} />
       </FormGroup>
 
-      <FormText className="d-block mb-3">
-        Point and active changes apply from {formatDayLabel(today)} onward. Earlier days
-        keep the values they had.
+      <FormText className="d-block mb-3 lh-sm">
+        Point and active changes apply from {formatDayLabel(today)} onward.
+        Earlier days keep the values they had.
       </FormText>
 
       <div className="d-grid gap-2">
         <Button type="submit" variant="primary" size="lg" disabled={pending}>
           {pending ? (
-            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
           ) : (
             "Save"
           )}
         </Button>
-        <Button type="button" variant="outline-secondary" onClick={onDone} disabled={pending}>
+        <Button
+          type="button"
+          variant="outline-secondary"
+          onClick={onDone}
+          disabled={pending}>
           Cancel
         </Button>
       </div>

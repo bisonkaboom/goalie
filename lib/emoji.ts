@@ -18,17 +18,6 @@ export const DEFAULT_EMOJI = "⭐";
 /** Search results are capped so the grid stays a glanceable single block. */
 export const MAX_RESULTS = 15;
 
-export const CATEGORY_LABELS: Record<string, string> = {
-  people: "Smileys & people",
-  nature: "Animals & nature",
-  foods: "Food & drink",
-  activity: "Activity",
-  places: "Travel & places",
-  objects: "Objects",
-  symbols: "Symbols",
-  flags: "Flags",
-};
-
 /**
  * Emoji are multi-code-unit and often multi-code-point — "👨‍👩‍👧‍👦".length is 11,
  * spanning 7 code points joined by zero-width joiners. `maxLength={1}` or

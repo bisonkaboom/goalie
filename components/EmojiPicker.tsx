@@ -4,11 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import Button from "react-bootstrap/Button";
 import FormControl from "react-bootstrap/FormControl";
 import FormLabel from "react-bootstrap/FormLabel";
-import FormText from "react-bootstrap/FormText";
 import Spinner from "react-bootstrap/Spinner";
 import type { EmojiMartData } from "@emoji-mart/data";
 import {
-  CATEGORY_LABELS,
   MAX_RESULTS,
   categoryEmojis,
   findByGlyph,
@@ -19,10 +17,12 @@ import {
 import { readRecents } from "@/lib/emojiRecents";
 import { isEmojiRenderable } from "@/lib/emojiSupport";
 
-/** Pseudo-category id for the recents row. */
-const RECENT = "recent";
-
-const FALLBACK_CATEGORY = "activity";
+/**
+ * What the grid shows before the user has any recents. "activity" is the one
+ * category whose contents read as goals — running, lifting, sport — so it works
+ * as a starter set rather than as an arbitrary slice of the dataset.
+ */
+const SUGGESTED_CATEGORY = "activity";
 
 /** A result carries its own glyph so a toned recent renders as 💪🏽, not 💪. */
 type Choice = { emoji: Emoji; glyph: string };
@@ -30,10 +30,21 @@ type Choice = { emoji: Emoji; glyph: string };
 /**
  * Search-driven emoji picker.
  *
- * With no query it browses recents (or a category), so there is always
- * something to tap; typing switches to ranked search capped at 15 results.
- * Results are filtered through a canvas render test, so emoji this device has
- * no glyph for never appear as tofu boxes.
+ * With no query it shows recents, or a starter set the first time round, so
+ * there is always something to tap; typing switches to ranked search capped at
+ * 15 results. Results are filtered through a canvas render test, so emoji this
+ * device has no glyph for never appear as tofu boxes.
+ *
+ * There is deliberately no category browser. Eight chips of "Smileys & people"
+ * and "Travel & places" is a second, competing way to find an emoji, and it
+ * cost a scrolling row across the top of a bottom sheet that is already tight
+ * on a phone. Search plus recents covers the same ground in less space.
+ *
+ * Skin tones are not offered either. A goal's icon is seen at list size, where
+ * the tone barely reads, and the row only appeared for the 305 of 1,870 emoji
+ * that carry variants — so it was a control that came and went unpredictably
+ * for a choice that does not show. A tone already saved still renders as saved:
+ * the picker stores whole glyphs, so nothing existing is rewritten.
  */
 export default function EmojiPicker({
   value,
@@ -45,7 +56,6 @@ export default function EmojiPicker({
   const [data, setData] = useState<EmojiMartData | null>(null);
   const [recents, setRecents] = useState<string[]>([]);
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState(FALLBACK_CATEGORY);
 
   // The dataset is fetched on first mount rather than imported statically, so
   // it only costs anything once the goal editor is actually opened. Recents are
@@ -59,7 +69,6 @@ export default function EmojiPicker({
       if (!active) return;
       setData(loaded);
       setRecents(stored);
-      if (stored.length > 0) setCategory(RECENT);
     });
 
     return () => {
@@ -79,21 +88,21 @@ export default function EmojiPicker({
         .slice(0, MAX_RESULTS);
     }
 
-    if (category === RECENT) {
-      return recents
-        .map((glyph) => {
-          const emoji = findByGlyph(data, glyph);
-          return emoji ? { emoji, glyph } : null;
-        })
-        .filter((choice): choice is Choice => choice !== null)
-        .filter((choice) => isEmojiRenderable(choice.glyph));
-    }
+    const recent = recents
+      .map((glyph) => {
+        const emoji = findByGlyph(data, glyph);
+        return emoji ? { emoji, glyph } : null;
+      })
+      .filter((choice): choice is Choice => choice !== null)
+      .filter((choice) => isEmojiRenderable(choice.glyph));
 
-    return categoryEmojis(data, category, MAX_RESULTS * 4)
+    if (recent.length > 0) return recent;
+
+    return categoryEmojis(data, SUGGESTED_CATEGORY, MAX_RESULTS * 4)
       .map((emoji) => ({ emoji, glyph: emoji.skins[0].native }))
       .filter((choice) => isEmojiRenderable(choice.glyph))
       .slice(0, MAX_RESULTS);
-  }, [data, query, category, recents]);
+  }, [data, query, recents]);
 
   const selected = useMemo(
     () => (data ? findByGlyph(data, value) : null),
@@ -132,28 +141,6 @@ export default function EmojiPicker({
         </div>
       ) : (
         <>
-          {query.trim() ? null : (
-            <div className="d-flex gap-1 overflow-auto pb-2 mb-1">
-              {recents.length > 0 ? (
-                <CategoryChip
-                  id={RECENT}
-                  label="Recent"
-                  isActive={category === RECENT}
-                  onSelect={setCategory}
-                />
-              ) : null}
-              {data.categories.map((entry) => (
-                <CategoryChip
-                  key={entry.id}
-                  id={entry.id}
-                  label={CATEGORY_LABELS[entry.id] ?? entry.id}
-                  isActive={category === entry.id}
-                  onSelect={setCategory}
-                />
-              ))}
-            </div>
-          )}
-
           {results.length === 0 ? (
             <p className="text-body-secondary small mb-0 py-2">
               {query.trim()
@@ -173,66 +160,8 @@ export default function EmojiPicker({
               ))}
             </div>
           )}
-
-          {selected && selected.skins.length > 1 ? (
-            <SkinToneRow emoji={selected} value={value} onChange={onChange} />
-          ) : null}
         </>
       )}
-    </div>
-  );
-}
-
-function CategoryChip({
-  id,
-  label,
-  isActive,
-  onSelect,
-}: {
-  id: string;
-  label: string;
-  isActive: boolean;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <Button
-      type="button"
-      size="sm"
-      variant={isActive ? "primary" : "outline-secondary"}
-      className="flex-shrink-0"
-      aria-pressed={isActive}
-      onClick={() => onSelect(id)}
-    >
-      {label}
-    </Button>
-  );
-}
-
-/** Only 305 of the 1,870 emoji carry tone variants, so this stays hidden most of the time. */
-function SkinToneRow({
-  emoji,
-  value,
-  onChange,
-}: {
-  emoji: Emoji;
-  value: string;
-  onChange: (emoji: string) => void;
-}) {
-  return (
-    <div className="mt-2">
-      <FormText className="d-block mb-1">Skin tone</FormText>
-      <div className="d-flex gap-1" role="group" aria-label="Skin tone">
-        {emoji.skins.map((skin, index) => (
-          <EmojiButton
-            key={skin.unified}
-            emoji={emoji}
-            glyph={skin.native}
-            isSelected={skin.native === value}
-            onSelect={onChange}
-            label={index === 0 ? `${emoji.name}, default` : `${emoji.name}, tone ${index}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }
@@ -242,13 +171,11 @@ function EmojiButton({
   glyph,
   isSelected,
   onSelect,
-  label,
 }: {
   emoji: Emoji;
   glyph: string;
   isSelected: boolean;
   onSelect: (emoji: string) => void;
-  label?: string;
 }) {
   return (
     <Button
@@ -261,8 +188,8 @@ function EmojiButton({
       }`}
       // The dataset's real name, so screen readers and long-press tooltips get
       // "Flexed Biceps" instead of a bare glyph.
-      aria-label={label ?? emoji.name}
-      title={label ?? emoji.name}
+      aria-label={emoji.name}
+      title={emoji.name}
       aria-pressed={isSelected}
       onClick={() => onSelect(glyph)}
     >

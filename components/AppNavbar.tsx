@@ -41,7 +41,9 @@ export default async function AppNavbar() {
             className="d-flex align-items-center gap-2 brand-wordmark text-brand"
           >
             <BrandMark />
-            Goalie
+            {/* Wrapped so the word can be optically centred against the mark;
+                see .brand-wordmark-text. */}
+            <span className="brand-wordmark-text">Goalie</span>
           </NavbarBrand>
 
           {user ? (

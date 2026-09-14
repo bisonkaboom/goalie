@@ -18,8 +18,12 @@ export default async function TrackPage() {
 
   return (
     <>
-      <h1 className="h4 mb-1">Track</h1>
-      <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
+      <h1 className="h4 mb-3">
+        Track
+        <span className="fw-light ms-1 text-body-secondary small">
+          - {formatDayLabel(today)}
+        </span>
+      </h1>
       <TallyList goals={active} />
     </>
   );

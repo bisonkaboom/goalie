@@ -77,6 +77,20 @@ body {
   font-size: 1.7rem;
 }
 
+/* The word in the horizontal lockup, nudged down onto the mark's centre line.
+   `align-items: center` centres the text's *line box*, but Fugaz One's ink does
+   not sit centred inside it: the font's ascent and descent are 1.029em and
+   0.404em, so the baseline lands 0.3125em below the line box's middle, while
+   "Goalie" — ascenders, no descenders — has its ink centred only 0.2486em below
+   its baseline. The 0.064em gap between those is the whole bug, and it is why
+   this cannot be fixed with line-height: the line box height cancels out of
+   both sides. Measured from the shipped woff2, so it moves only if the face
+   does. inline-block because a transform does not apply to an inline box. */
+.brand-wordmark-text {
+  display: inline-block;
+  transform: translateY(0.064em);
+}
+
 /* 55% opaque, so the blur that was already declared here finally does something
    — against the old solid --bs-body-bg it had nothing to see through.
 
@@ -252,9 +266,16 @@ body {
    minmax(0, 1fr) rather than 1fr for the same reason as .day-week-row: a plain
    1fr track has an automatic minimum, which stops text-truncate working on the
    goal names inside. align-items: start keeps the shorter column from being
-   stretched to match the taller one. */
+   stretched to match the taller one.
+
+   The single column below lg needs the same minmax, and needs it spelled out:
+   left implicit, the one column is an `auto` track, whose automatic minimum is
+   the goal rows' max-content width — a long goal name then pushed the whole
+   panel past the viewport, the row's buttons out of sight, and the name itself
+   never truncated because the row was never short of space. */
 .tally-columns {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
 }
 
