@@ -2,8 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabase/config";
 
-/** Routes reachable without a session. Everything else redirects to /signin. */
-const PUBLIC_PATHS = ["/signin", "/auth"];
+/**
+ * Routes reachable without a session. Everything else redirects to /signin.
+ *
+ * The two legal documents are public because they have to be: Google's OAuth
+ * verification fetches them while signed out, and a redirect to /signin reads
+ * as a missing privacy policy. They are also the pages a user is most likely to
+ * want *before* deciding to hand over their Google account.
+ */
+const PUBLIC_PATHS = ["/signin", "/auth", "/privacy", "/terms"];
 
 export async function proxy(request: NextRequest) {
   // Mutated by setAll below: Supabase writes refreshed tokens onto this response.

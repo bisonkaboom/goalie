@@ -1,5 +1,6 @@
 import Container from "react-bootstrap/Container";
 import AppNavbar from "@/components/AppNavbar";
+import SiteFooter from "@/components/SiteFooter";
 import TimeZoneSync from "@/components/TimeZoneSync";
 import { getProfile } from "@/lib/db/queries";
 
@@ -19,6 +20,7 @@ export default async function TabsLayout({ children }: LayoutProps<"/">) {
       <Container as="main" className="app-shell py-4">
         {children}
       </Container>
+      <SiteFooter />
       <TimeZoneSync current={profile.timeZone} />
     </>
   );

@@ -150,6 +150,22 @@ body {
   margin-inline: auto;
 }
 
+/* The terms and privacy documents: a dozen short sections in a row, which is a
+   rhythm Bootstrap's type scale is not set up for. Its headings carry no top
+   margin at all, because they normally introduce a component that supplies its
+   own spacing — run as prose, every heading ends up glued to the paragraph
+   above it. The paragraph's own bottom margin is trimmed to keep each heading
+   grouped with the text it belongs to rather than floating between two
+   sections. */
+.legal-prose h2 {
+  margin-top: 2rem;
+}
+
+.legal-prose p,
+.legal-prose ul {
+  margin-bottom: 0.75rem;
+}
+
 /* Keep tap targets finger-friendly on mobile. */
 @media (max-width: 575.98px) {
   .btn-lg {

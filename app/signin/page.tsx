@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import BrandMark from "@/components/BrandMark";
+import SiteFooter from "@/components/SiteFooter";
 import { SignInButton } from "@/components/AuthButtons";
 import { getCurrentUser } from "@/lib/supabase/user";
 
@@ -48,6 +49,16 @@ export default async function SignInPage({
           We only use your Google account to sign you in.
         </p>
       </Card>
+
+      {/* Inside the centred column rather than after it: this page is a full
+          viewport of vertical centring, so a footer placed as a sibling would
+          be pushed a screen below the card. It is also the one place the legal
+          links have to be reachable without a session — Google's OAuth review
+          reads them from here, since `/` redirects a signed-out visitor to this
+          page. */}
+      <div className="mt-4">
+        <SiteFooter />
+      </div>
     </Container>
   );
 }
