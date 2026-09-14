@@ -4,9 +4,9 @@ import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
-// Subcomponents come from their own modules — see AppNavbar for why.
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import GoalEditorOffcanvas from "@/components/GoalEditorOffcanvas";
+import PlusIcon from "@/components/PlusIcon";
 import { directionLabel } from "@/lib/db/types";
 import type { GoalOnDay } from "@/lib/db/types";
 
@@ -46,13 +46,21 @@ export default function GoalSetupList({
     <>
       <div className="d-flex align-items-center justify-content-between mb-2">
         <h2 className="h6 mb-0">Goals</h2>
-        <Button size="sm" onClick={openCreate}>
-          Add goal
+        {/* Flex rather than a margin on the icon: it centres the glyph against
+            the label without a vertical-align fudge factor. */}
+        <Button
+          size="sm"
+          className="d-inline-flex align-items-center gap-1"
+          onClick={openCreate}>
+          <PlusIcon />
+          Goal
         </Button>
       </div>
 
       {goals.length === 0 ? (
-        <p className="text-body-secondary">No goals yet. Add one to start tracking.</p>
+        <p className="text-body-secondary">
+          No goals yet. Add one to start tracking.
+        </p>
       ) : (
         <>
           <GoalGroup title="Do More" goals={doMore} onEdit={openEdit} />
@@ -97,8 +105,7 @@ function GoalGroup({
             onClick={() => onEdit(goal)}
             className={`d-flex align-items-center gap-3 text-start ${
               goal.isEnabled ? "" : "opacity-75"
-            }`}
-          >
+            }`}>
             <span className="fs-4" aria-hidden="true">
               {goal.emoji}
             </span>

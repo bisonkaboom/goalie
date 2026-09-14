@@ -38,16 +38,25 @@ export default async function AppNavbar() {
         <div className="d-flex align-items-center justify-content-between py-2">
           <NavbarBrand
             href="/"
-            className="d-flex align-items-center gap-2 brand-wordmark text-brand"
-          >
+            className="d-flex align-items-center gap-2 brand-wordmark text-brand">
             <BrandMark />
             {/* Wrapped so the word can be optically centred against the mark;
                 see .brand-wordmark-text. */}
-            <span className="brand-wordmark-text">Goalie</span>
+            <span className="brand-wordmark-text">
+              Goalie
+              <span
+                className="ms-1 d-none d-sm-inline"
+                style={{ opacity: 0.15 }}>
+                Rocks
+              </span>
+            </span>
           </NavbarBrand>
 
           {user ? (
-            <UserMenu name={firstName(user.name, user.email)} avatarUrl={user.avatarUrl} />
+            <UserMenu
+              name={firstName(user.name, user.email)}
+              avatarUrl={user.avatarUrl}
+            />
           ) : null}
         </div>
 
