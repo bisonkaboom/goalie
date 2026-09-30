@@ -373,23 +373,36 @@ function GoalRowBody({
         <Button
           variant="outline-secondary"
           size="sm"
+          className="tally-step"
           aria-label={`Remove one ${goal.name}`}
           disabled={goal.count === 0 || !onAdjust}
           onClick={() => onAdjust?.(goal.id, -1)}
         >
-          −1
+          −
         </Button>
-        <span className="fw-bold text-center" style={{ minWidth: "2ch" }} aria-live="polite">
-          {goal.count}
+        {/* "2x", not "2": the number sits beside a points value on the same
+            row, and bare digits read as a second score rather than as how many
+            times the goal was logged.
+            3ch, because a double-digit count plus the suffix is the widest this
+            gets — at 2ch the buttons would shift outwards on the tenth tap. */}
+        <span className="fw-bold text-center" style={{ minWidth: "3ch" }}>
+          <span aria-hidden="true">{goal.count}x</span>
+          {/* The visible label is announced as "two x", so the live region
+              carries words instead. Hidden rather than duplicated-and-styled so
+              the two can never disagree about the count. */}
+          <span className="visually-hidden" aria-live="polite">
+            {goal.count === 1 ? "1 time" : `${goal.count} times`}
+          </span>
         </span>
         <Button
           variant={isDoMore ? "success" : "outline-danger"}
           size="sm"
+          className="tally-step"
           aria-label={`Add one ${goal.name}`}
           disabled={!onAdjust}
           onClick={() => onAdjust?.(goal.id, 1)}
         >
-          +1
+          +
         </Button>
       </div>
     </div>

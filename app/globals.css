@@ -377,6 +377,43 @@ body {
   cursor: grabbing;
 }
 
+/* The first-of-the-month embed. Bootstrap's .ratio ships nothing taller than
+   square — its set runs 1x1 to 21x9 — and a vertical Short dropped into a 16x9
+   box is two black bars around a postage stamp. 9/16 as a percentage. */
+.ratio-9x16 {
+  --bs-aspect-ratio: 177.78%;
+}
+
+/* Capped well below the reading column: at full width a 9:16 frame is a
+   skyscraper that pushes the day's score off the bottom of the screen, which
+   is the opposite of what the Home page is for. The gag gets a phone-sized
+   pane and the score stays visible under it. */
+.first-of-month-frame {
+  max-width: 240px;
+  border-radius: 0.5rem;
+  /* The player paints square corners of its own, so the radius has to clip. */
+  overflow: hidden;
+}
+
+/* Loud, but not in the wordmark's face — Fugaz One is reserved for the brand
+   lockup (see the note in layout.tsx), so this borrows only the brand colour. */
+.first-of-month-banner {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--goalie-brand);
+}
+
+/* The − and + steppers. Their labels are one glyph each, so left to Bootstrap's
+   padding alone they come out narrow, and narrower still than they look — the
+   minus sign is a good deal thinner than the plus in most faces, which reads as
+   a pair of mismatched buttons. A shared floor makes them square, equal, and
+   large enough to hit with a thumb, which matters here more than anywhere else
+   in the app: this is the one control people tap repeatedly. */
+.tally-step {
+  min-width: 2.25rem;
+}
+
 /* The floating copy under the cursor. It leaves the list's stacking context, so
    it needs its own surface to sit on. */
 .tally-row-overlay {

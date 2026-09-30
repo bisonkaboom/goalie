@@ -8,7 +8,7 @@
  */
 
 /** Shown as "Last updated" on both documents. Bump when either one changes. */
-export const LEGAL_LAST_UPDATED = "September 14, 2026";
+export const LEGAL_LAST_UPDATED = "September 24, 2026";
 
 /**
  * The published contact address, and the only route for a deletion request

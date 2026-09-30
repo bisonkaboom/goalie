@@ -58,7 +58,9 @@ export default function PrivacyPage() {
         A sign-in cookie from Supabase keeps you signed in between visits, and
         two small cookies remember your colour theme and background choice.
         Those two hold only the option you picked and cannot be read by
-        JavaScript. There are no advertising or tracking cookies of any kind.
+        JavaScript. Goalie sets no advertising or tracking cookies of its own.
+        The one thing outside that is the YouTube player described below, which
+        may set cookies of Google&rsquo;s if you press play on it.
       </p>
 
       <h2 className="h5">Who else handles your data</h2>
@@ -73,6 +75,14 @@ export default function PrivacyPage() {
         <li>
           <strong>Vercel</strong> — hosting, which means it processes the web
           requests your browser makes.
+        </li>
+        <li>
+          <strong>YouTube</strong> — on the first of each month, the Home page
+          embeds one video. It is loaded through youtube-nocookie.com, the
+          privacy-enhanced player, which holds off on cookies until you press
+          play. Google sees your IP address and browser the way it would for any
+          embedded video, and is told nothing about your account or your goals.
+          Nothing plays on its own.
         </li>
         <li>
           <strong>Animal photo sources</strong> — if a background is switched on,

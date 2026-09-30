@@ -28,6 +28,17 @@ export function daysEndingAt(end: string, length: number): string[] {
   return Array.from({ length }, (_, i) => addDays(end, i - length + 1));
 }
 
+/**
+ * Whether a `YYYY-MM-DD` falls on the first of its month.
+ *
+ * String-sliced rather than parsed, for the same reason the helpers above are:
+ * `new Date("2026-10-01").getDate()` is 1 only if the runtime's zone is at or
+ * east of UTC, and 30 everywhere in the Americas.
+ */
+export function isFirstOfMonth(day: string): boolean {
+  return day.slice(-2) === "01";
+}
+
 /** e.g. "Tue, Sep 9" — for chart axes and day headings. */
 export function formatDayLabel(day: string): string {
   const [year, month, date] = day.split("-").map(Number);

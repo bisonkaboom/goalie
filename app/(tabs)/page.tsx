@@ -1,10 +1,12 @@
 import AnimalBackground from "@/components/AnimalBackground";
 import DayChart from "@/components/DayChart";
+import FirstOfTheMonth from "@/components/FirstOfTheMonth";
 import {
   addDays,
   daysEndingAt,
   formatDayLabel,
   formatWeekdayShort,
+  isFirstOfMonth,
 } from "@/lib/dates";
 import { getDayScores, getToday } from "@/lib/db/queries";
 import { netScore, type DayScore } from "@/lib/db/types";
@@ -61,6 +63,10 @@ export default async function HomePage() {
       <div className={`app-reading${showPhoto ? " animal-panel" : ""}`}>
         <h1 className="h4 mb-1">Today</h1>
         <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
+
+        {/* Keyed off `today`, which is already the user's own calendar day, so
+            the cows arrive at their midnight rather than at UTC's. */}
+        {isFirstOfMonth(today) ? <FirstOfTheMonth /> : null}
 
         <div className="d-flex justify-content-center mb-4">
           <DayChart {...todayScore} label="Today" size={260} showTarget />
