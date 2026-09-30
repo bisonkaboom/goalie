@@ -67,7 +67,18 @@ type Action =
  * reshuffle between taps and the user would hit the wrong goal. Bucket is the
  * one exception, and only because moving a row is the user's own explicit act.
  */
-export default function TallyList({ goals }: { goals: GoalOnDay[] }) {
+export default function TallyList({
+  goals,
+  day,
+}: {
+  goals: GoalOnDay[];
+  /**
+   * Which day taps are filed against. Passed down rather than resolved in the
+   * action, so what the screen says it is editing and what gets written are
+   * the same value — the server re-validates it, but cannot re-derive it.
+   */
+  day: string;
+}) {
   const [, startTransition] = useTransition();
   const [optimisticGoals, apply] = useOptimistic(
     goals,
@@ -132,7 +143,7 @@ export default function TallyList({ goals }: { goals: GoalOnDay[] }) {
   function handleAdjust(goalId: string, delta: number) {
     startTransition(async () => {
       apply({ type: "adjust", goalId, delta });
-      await adjustTally(goalId, delta);
+      await adjustTally(goalId, delta, day);
     });
   }
 

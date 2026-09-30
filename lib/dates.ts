@@ -29,6 +29,23 @@ export function daysEndingAt(end: string, length: number): string[] {
 }
 
 /**
+ * Whether a value is a real `YYYY-MM-DD` calendar date.
+ *
+ * The shape test alone is not enough: `2026-02-30` and `2026-13-01` both match
+ * the pattern, and `Date` silently rolls them forward rather than rejecting
+ * them, so the only reliable check is whether the date survives a round trip
+ * unchanged. That also rules out a two-digit year — `Date.UTC(50, …)` means
+ * 1950, which will not format back as `0050`.
+ *
+ * Load-bearing for `adjustTally`, which takes a day from the client.
+ */
+export function isCalendarDay(value: unknown): value is string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, date] = value.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, date)).toISOString().slice(0, 10) === value;
+}
+
+/**
  * Whether a `YYYY-MM-DD` falls on the first of its month.
  *
  * String-sliced rather than parsed, for the same reason the helpers above are:

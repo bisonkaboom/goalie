@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile, getToday } from "@/lib/db/queries";
+import { isCalendarDay } from "@/lib/dates";
 import { DEFAULT_EMOJI, firstGrapheme, isEmojiLike } from "@/lib/emoji";
 import { isGoalBucket, type GoalDirection } from "@/lib/db/types";
 
@@ -190,17 +191,32 @@ export async function setGoalBucket(goalId: string, bucket: string) {
 }
 
 /**
- * +1 / -1 on the tally screen. Delegates to a Postgres function so the
+ * + / − on the tally screen. Delegates to a Postgres function so the
  * increment is a single statement: a read-then-write here would drop taps, and
  * the optimistic UI actively encourages rapid tapping.
+ *
+ * `day` defaults to today and may name any earlier date, which is what lets a
+ * late night be filed against the day it actually belongs to. It is validated
+ * rather than trusted: this is a public POST endpoint, and an unchecked value
+ * would reach `adjust_tally`'s `date` parameter as arbitrary text, or plant a
+ * count on a future day that no `goal_settings` row can price.
  */
-export async function adjustTally(goalId: string, delta: number): Promise<number> {
+export async function adjustTally(
+  goalId: string,
+  delta: number,
+  day?: string,
+): Promise<number> {
   const supabase = await createClient();
   const today = await getToday();
 
+  const target = day ?? today;
+  if (!isCalendarDay(target) || target > today) {
+    throw new Error("Tallies can only be logged against a day that has happened.");
+  }
+
   const { data, error } = await supabase.rpc("adjust_tally", {
     p_goal_id: goalId,
-    p_day: today,
+    p_day: target,
     p_delta: Math.trunc(delta),
   });
   if (error) throw error;

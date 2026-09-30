@@ -1,5 +1,7 @@
+import Link from "next/link";
 import AnimalBackground from "@/components/AnimalBackground";
 import DayChart from "@/components/DayChart";
+import DayNav from "@/components/DayNav";
 import FirstOfTheMonth from "@/components/FirstOfTheMonth";
 import {
   addDays,
@@ -11,6 +13,7 @@ import {
 import { getDayScores, getToday } from "@/lib/db/queries";
 import { netScore, type DayScore } from "@/lib/db/types";
 import { readPreferences } from "@/lib/preferences";
+import { dayHref, resolveViewedDay } from "@/lib/viewedDay";
 
 const WINDOW_DAYS = 7;
 
@@ -22,14 +25,17 @@ const WINDOW_DAYS = 7;
  * force *that* day, so a goal revalued midweek does not distort the days
  * before it.
  */
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: PageProps<"/">) {
   const { background } = await readPreferences();
   const showPhoto = background !== "none";
-  const today = await getToday();
-  const yesterday = addDays(today, -1);
-  // The window is the seven days *before* today, so the range reaches back one
-  // extra day beyond the tiles to still cover today's own chart.
-  const scores = await getDayScores(addDays(today, -WINDOW_DAYS), today);
+  const { day: requested } = await searchParams;
+  const { day, today, isToday } = resolveViewedDay(requested, await getToday());
+  const previousDay = addDays(day, -1);
+  // The window is the seven days *before* the viewed day, so the range reaches
+  // back one extra day beyond the tiles to still cover that day's own chart.
+  // Stepping to a past day carries the strip with it, so the week below is
+  // always the week leading up to whatever is on screen.
+  const scores = await getDayScores(addDays(day, -WINDOW_DAYS), day);
 
   // day_scores generates a row per day, but keying off the requested window
   // means the row of tiles is always seven wide regardless.
@@ -40,11 +46,11 @@ export default async function HomePage() {
     negative: 0,
     target: 0,
   });
-  const week: DayScore[] = daysEndingAt(yesterday, WINDOW_DAYS).map(
-    (day) => byDay.get(day) ?? emptyDay(day),
+  const week: DayScore[] = daysEndingAt(previousDay, WINDOW_DAYS).map(
+    (entry) => byDay.get(entry) ?? emptyDay(entry),
   );
 
-  const todayScore = byDay.get(today) ?? emptyDay(today);
+  const dayScore = byDay.get(day) ?? emptyDay(day);
   const scored = week.filter((score) => score.target > 0);
   const metCount = scored.filter(
     (score) => netScore(score) >= score.target,
@@ -61,28 +67,50 @@ export default async function HomePage() {
       {/* The frosted slab only earns its border and shadow when there is a photo
           behind it, so with None the Home page is plain content again. */}
       <div className={`app-reading${showPhoto ? " animal-panel" : ""}`}>
-        <h1 className="h4 mb-1">Today</h1>
-        <p className="text-body-secondary mb-3">{formatDayLabel(today)}</p>
+        {/* The heading is the day itself, so a past day announces itself in
+            the first line rather than in a note underneath. */}
+        <h1 className="h4 mb-1">{isToday ? "Today" : formatDayLabel(day)}</h1>
+        <p className="text-body-secondary mb-3">
+          {isToday ? formatDayLabel(today) : "Viewing a past day"}
+        </p>
 
-        {/* Keyed off `today`, which is already the user's own calendar day, so
-            the cows arrive at their midnight rather than at UTC's. */}
-        {isFirstOfMonth(today) ? <FirstOfTheMonth /> : null}
+        <DayNav basePath="/" day={day} today={today} />
+
+        {/* Keyed off the viewed day, which is already the user's own calendar
+            day, so the cows arrive at their midnight rather than at UTC's —
+            and stepping back to the 1st of last month finds them waiting. */}
+        {isFirstOfMonth(day) ? <FirstOfTheMonth /> : null}
 
         <div className="d-flex justify-content-center mb-4">
-          <DayChart {...todayScore} label="Today" size={260} showTarget />
+          <DayChart
+            {...dayScore}
+            label={isToday ? "Today" : undefined}
+            day={day}
+            size={260}
+            showTarget
+          />
         </div>
 
         <h2 className="h6 mb-2">Previous 7 days</h2>
         <div className="day-week-row mb-2">
           {week.map((score) => (
-            <div key={score.day} className="text-center">
+            // The whole tile is the link, gauge and weekday together: at this
+            // size the ring is a much easier target than the three letters
+            // under it, and on a phone it is the only one worth aiming at.
+            <Link
+              key={score.day}
+              href={dayHref("/", score.day, today)}
+              className="day-week-tile text-center"
+            >
               {/* The target is dropped at this size — seven of them is noise, and
-                  the ring already shows how close the day came. */}
-              <DayChart {...score} showTarget={false} />
+                  the ring already shows how close the day came.
+                  `day` gives the gauge a real accessible name, which is what
+                  the link now announces itself with. */}
+              <DayChart {...score} day={score.day} showTarget={false} />
               <div className="small text-body-secondary text-truncate mt-1">
                 {formatWeekdayShort(score.day)}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

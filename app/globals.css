@@ -270,6 +270,77 @@ body {
   height: auto;
 }
 
+/* The ‹ › stepper. The middle track is a flexible column rather than a gap, so
+   the arrows keep the same positions whether or not "Back to today" is in
+   there — otherwise they slide inwards the instant you arrive on today, which
+   is exactly when a second tap is most likely to be aimed at the old spot. */
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.day-nav-middle {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  /* Reserves the button's height even while empty, so the row does not change
+     height on the step back to today. */
+  min-height: 31px;
+  align-items: center;
+}
+
+/* Says out loud that the tally buttons below are pointed somewhere other than
+   today. Tinted rather than merely italic: this is the one warning in the app
+   whose absence costs data — a demerit filed against the wrong date. */
+.day-past-notice {
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--goalie-brand);
+  border-radius: 0.25rem;
+  background-color: var(--bs-tertiary-bg);
+  font-size: 0.875rem;
+  color: var(--bs-body-color);
+}
+
+/* A week tile is a link now. Bootstrap's anchor colour would tint the weekday
+   label and the underline would sit across it, so both are reset and the
+   affordance is carried by the hover lift instead. */
+.day-week-tile {
+  display: block;
+  padding: 0.25rem 0;
+  border-radius: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+.day-week-tile:hover,
+.day-week-tile:focus-visible {
+  color: inherit;
+  background-color: var(--bs-tertiary-bg);
+  transform: translateY(-2px);
+}
+
+/* Focus has to be visible against a photo as well as a flat page, so it is the
+   ring rather than the background that carries it. */
+.day-week-tile:focus-visible {
+  outline: 2px solid var(--goalie-brand);
+  outline-offset: 2px;
+}
+
+/* Seven tiles that lift on hover is a lot of motion for anyone who asked for
+   less; the background change alone still answers "is this clickable?". */
+@media (prefers-reduced-motion: reduce) {
+  .day-week-tile {
+    transition: none;
+  }
+
+  .day-week-tile:hover,
+  .day-week-tile:focus-visible {
+    transform: none;
+  }
+}
+
 /* Seven columns on a small phone get tight; the gauges scale with the column
    so only the spacing needs trimming. */
 @media (max-width: 420px) {
