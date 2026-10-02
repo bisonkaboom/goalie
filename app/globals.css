@@ -574,6 +574,92 @@ body {
   background-color: rgba(255, 255, 255, 0.14);
 }
 
+/* The first-of-the-month takeover. Built to match .silly-duck — same black
+   field, same z-index, same centred column — so the app has one visual idiom
+   for "everything stops for a second".
+   Not `cursor: pointer` like the duck, because this surface does *not* dismiss:
+   the two things you can do to it are explicit buttons, and the first tap has
+   to be free to turn the sound on without also closing the thing. */
+.cow-takeover {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  /* Not a theme variable: blank means black in either theme. */
+  background-color: #000;
+  text-align: center;
+}
+
+.cow-takeover-text {
+  max-width: 20ch;
+  margin: 0;
+  color: #fff;
+  /* Scales with the viewport so the shout fits one phone screen without
+     wrapping into something unreadable. */
+  font-size: clamp(1.25rem, 5.5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+/* The vertical Short, sized to whatever is left after the banner and the two
+   buttons have taken their share. Height leads and the width follows from the
+   aspect ratio, which is the opposite of the inline embed this replaced — here
+   the binding constraint is the height of a phone in portrait, not the width
+   of a reading column. */
+.cow-takeover-frame {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  height: min(60dvh, 70vw * 16 / 9);
+  max-width: 100%;
+  border-radius: 0.5rem;
+  /* The player paints square corners of its own, so the radius has to clip. */
+  overflow: hidden;
+}
+
+.cow-takeover-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Loud, because it is the one control that makes the joke land. */
+.cow-takeover-sound {
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 2rem;
+  background-color: var(--goalie-brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* A real focusable control, so the overlay is dismissible by keyboard and
+   announced as something actionable rather than a dead black rectangle. */
+.cow-takeover-dismiss {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 2rem;
+  background-color: transparent;
+  color: #fff;
+}
+
+.cow-takeover-sound:hover,
+.cow-takeover-sound:focus-visible {
+  filter: brightness(1.1);
+}
+
+.cow-takeover-dismiss:hover,
+.cow-takeover-dismiss:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
 /* Bottom sheet for the goal editor. Bootstrap defaults .offcanvas-bottom to
    --bs-offcanvas-height: 30vh, which clips the form; auto height sizes to
    content and .offcanvas-bottom's own max-height:100% keeps it on screen. */

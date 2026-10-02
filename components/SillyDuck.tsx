@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
 import Image from "react-bootstrap/Image";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 /**
  * Vendored rather than hotlinked from flipanim.com. Hotlinking works today, but
@@ -16,29 +17,6 @@ const ANIMATED = "/easter-egg/silly-duck.gif";
  * animation they cannot stop.
  */
 const STILL = "/easter-egg/silly-duck.jpg";
-
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-
-/**
- * The media query as an external store rather than effect-driven state.
- *
- * A media query *is* external state, so this is what useSyncExternalStore is
- * for — and unlike reading it once in an effect, it keeps up if the setting is
- * changed while the overlay is still open.
- */
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    (onChange) => {
-      const query = window.matchMedia(REDUCED_MOTION);
-      query.addEventListener("change", onChange);
-      return () => query.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(REDUCED_MOTION).matches,
-    // Never actually reached: the overlay only mounts after a click. Present
-    // because useSyncExternalStore requires a server snapshot.
-    () => false,
-  );
-}
 
 /** The screen goes blank and the duck judges you. Dismissed by any interaction. */
 export default function SillyDuck({ onDismiss }: { onDismiss: () => void }) {

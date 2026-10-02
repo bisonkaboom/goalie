@@ -76,10 +76,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 
         <DayNav basePath="/" day={day} today={today} />
 
-        {/* Keyed off the viewed day, which is already the user's own calendar
-            day, so the cows arrive at their midnight rather than at UTC's —
-            and stepping back to the 1st of last month finds them waiting. */}
-        {isFirstOfMonth(day) ? <FirstOfTheMonth /> : null}
+        {/* Keyed off `today`, not the viewed day: this blanks the screen and
+            starts playing, so browsing back to a past 1st must not trigger it.
+            `today` is already the user's own calendar day, so the cows arrive
+            at their midnight rather than at UTC's. */}
+        {isToday && isFirstOfMonth(today) ? <FirstOfTheMonth day={today} /> : null}
 
         <div className="d-flex justify-content-center mb-4">
           <DayChart
